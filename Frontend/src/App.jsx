@@ -5,7 +5,6 @@ import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import * as THREE from 'three';
 
 const VANTA_CDN_NET = "https://cdn.jsdelivr.net/gh/tengbao/vanta@latest/dist/vanta.net.min.js";
-
 const App = () => {
   const [que, setQue] = useState("");
   const [userMsg, setUserMsg] = useState('');
@@ -13,6 +12,8 @@ const App = () => {
 
   const vantaRef = useRef(null);
   const vantaEffect = useRef(null);
+
+  const URL = `https://instructor-backend-59jq.onrender.com/`;
 
   useEffect(() => {
     if (!window.VANTA) {
@@ -56,7 +57,7 @@ const App = () => {
 
   const handkeClick = async () => {
     setUserMsg(que);
-    const res = await fetch(`http://localhost:8000/answer?question=${encodeURIComponent(que)}`);
+    const res = await fetch(`${URL}answer?question=${encodeURIComponent(que)}`);
     const data = await res.json();
     setAnswer(data.answer);
     setQue('');
@@ -67,10 +68,9 @@ const App = () => {
       ref={vantaRef}
       className="min-h-screen w-full text-white flex flex-col items-center px-4 py-10 relative"
     >
-      {/* Transparent overlay BELOW foreground content */}
+
       <div className="absolute inset-0 bg-black/50 pointer-events-none z-10"></div>
 
-      {/* Foreground content ABOVE overlay */}
       <div className="relative z-20 w-full max-w-3xl flex flex-col gap-10">
         <h1 className="text-4xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-center mt-10 mb-10">
           Hello, I'm Your <br /> Data Structure & Algorithm Instructor
