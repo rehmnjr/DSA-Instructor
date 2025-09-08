@@ -57,10 +57,15 @@ const App = () => {
 
   const handkeClick = async () => {
     setUserMsg(que);
+    try{
     const res = await fetch(`${URL}answer?question=${encodeURIComponent(que)}`);
     const data = await res.json();
     setAnswer(data.answer);
     setQue('');
+    }
+    catch(err){
+      alert(err)
+    }
   };
 
   return (
@@ -95,6 +100,7 @@ const App = () => {
 
           <div className="bg-black/70 w-full border border-gray-600 p-4 rounded">
             <ul className="flex flex-col gap-6">
+
               <div className="flex flex-col items-end">
                 <li className="bg-gradient-to-r from-fuchsia-900 to-blue-800 py-2 px-4 rounded-md max-w-full sm:max-w-[80%] break-words">
                   {userMsg}

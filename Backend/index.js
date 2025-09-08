@@ -1,4 +1,3 @@
-import { GoogleGenAI } from "@google/genai";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import 'dotenv/config'
 import cors from 'cors';
@@ -38,7 +37,7 @@ app.get('/answer',async(req,res)=>{
 
   }catch(err){
     console.error(err);
-    res.status(500).json({ status: 0, msg: 'Something went wrong' });
+    res.status(500).json({ status: 0, msg:'⚠️ The server is currently experiencing high load from the Gemini API provider. Please try again in a few moments.', Error:err });
   }
 });
 
