@@ -9,6 +9,7 @@ const App = () => {
   const [que, setQue] = useState("");
   const [userMsg, setUserMsg] = useState('');
   const [answer, setAnswer] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const vantaRef = useRef(null);
   const vantaEffect = useRef(null);
@@ -56,15 +57,25 @@ const App = () => {
   const handleChange = (e) => setQue(e.target.value);
 
   const handkeClick = async () => {
-    setUserMsg(que);
+
+    if(!que.trim()) return alert("Please enter a question.");
+    setUserMsg(que.trim());
+    setLoading(true)
     try{
     const res = await fetch(`${URL}answer?question=${encodeURIComponent(que)}`);
     const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data?.error || "Something went wrong with the API.");
+    }
     setAnswer(data.answer);
     setQue('');
     }
     catch(err){
-      alert(err)
+      console.error("Fetch error:", err);
+      alert(err.message || "⚠️ Unexpected error occurred. Please try again.");  
+    }
+    finally{
+      setLoading(false)
     }
   };
 
@@ -99,7 +110,7 @@ const App = () => {
           </div>
 
           <div className="bg-black/70 w-full border border-gray-600 p-4 rounded">
-            <ul className="flex flex-col gap-6">
+            {!userMsg?"":(<ul className="flex flex-col gap-6">
 
               <div className="flex flex-col items-end">
                 <li className="bg-gradient-to-r from-fuchsia-900 to-blue-800 py-2 px-4 rounded-md max-w-full sm:max-w-[80%] break-words">
@@ -110,7 +121,7 @@ const App = () => {
 
               <div className="flex flex-col items-start">
                 <span className="text-sm text-gray-400 mb-1">DSA Bot:</span>
-                <li className="bg-gradient-to-r from-fuchsia-900 to-blue-800 py-2 px-4 rounded-md max-w-full sm:max-w-[80%] break-words">
+                {loading?(<span>Thinking...</span>):(<li className="bg-gradient-to-r from-fuchsia-900 to-blue-800 py-2 px-4 rounded-md max-w-full sm:max-w-[80%] break-words">
                   <ReactMarkdown
                     children={answer}
                     components={{
@@ -133,9 +144,9 @@ const App = () => {
                       },
                     }}
                   />
-                </li>
+                </li>)}
               </div>
-            </ul>
+            </ul>)}
           </div>
         </div>
       </div>
