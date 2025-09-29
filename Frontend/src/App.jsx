@@ -65,7 +65,7 @@ const App = () => {
     const res = await fetch(`${URL}answer?question=${encodeURIComponent(que)}`);
     const data = await res.json();
     if (!res.ok) {
-      throw new Error(data?.error || "Something went wrong with the API.");
+      throw new Error(data?.error || "⚠️ The server is currently experiencing high load from the Gemini API provider. Please try again in a few moments.");
     }
     setAnswer(data.answer);
     setQue('');

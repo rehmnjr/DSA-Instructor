@@ -1,47 +1,63 @@
+import express from "express";
+import cors from "cors";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import 'dotenv/config'
-import cors from 'cors';
-import express from 'express';
-const app = express()
-app.use(express.json())
-app.use(cors());
-const ai = new GoogleGenerativeAI(process.env.GENAPI);
-app.get('/',(req,res)=>{
-  res.send("Backend is working....")
-})
+import "dotenv/config";
 
-app.get('/answer',async(req,res)=>{
-  try{
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+const ai = new GoogleGenerativeAI(process.env.GENAPI);
+
+app.get("/", (req, res) => {
+  res.send("Backend is working...");
+});
+
+app.get("/answer", async (req, res) => {
+  try {
     const question = req.query.question;
-    if(!question) return res.status(400).json({ status: 0, msg: 'Question is required' });
+
+    if (!question) {
+      return res
+        .status(400)
+        .json({ status: 0, msg: "Question is required" });
+    }
 
     const model = ai.getGenerativeModel({
-      model: 'gemini-1.5-flash',
-      systemInstruction: `You are a Data Structure and Algorithms (DSA) instructor and a tutor for all programming language from basic to advance.
-      Answer DSA problems or any question related to computer science engineering in short, concisely, simple & clearly and if you aksed to code then code should not write comments.
-      If the question is not related to DSA or leetcode like problems, respond very very rudely even you can use abusive words & remind him/her to ask DSA related question.`,
+      model: "gemini-2.0-flash",
+      systemInstruction: `You are a highly experienced and no-nonsense tutor specializing in Data Structures, Algorithms (DSA), and core Computer Science concepts.
+        You only answer questions strictly related to DSA, algorithms, coding problems (like LeetCode, Codeforces, etc.), and core CS topics such as memory management, operating systems, DBMS, etc.
+        Your answers must be short, crystal clear, and to the point.
+        When writing code, never include comments or unnecessary explanations. Use the most optimal and clean solution possible.
+        If the user asks an off-topic or irrelevant question (not related to DSA or CS), always respond aggressively & rudely with harsh abusive words.
+`
     });
 
     const result = await model.generateContent({
       contents: [
         {
           role: "user",
-          parts: [{ text: question }]
-        }
-      ]
+          parts: [{ text: question }],
+        },
+      ],
     });
 
     const response = await result.response;
     const text = response.text();
-    res.status(200).json({ status: 1, answer: text });
 
-  }catch(err){
-    console.error(err);
-    res.status(500).json({ status: 0, msg:'⚠️ The server is currently experiencing high load from the Gemini API provider. Please try again in a few moments.', Error:err });
+    console.log("AI Response:", text);
+    res.status(200).json({ status: 1, answer: text });
+  } catch (err) {
+    console.error("Gemini API Error:", err?.message || err);
+    res.status(500).json({
+      status: 0,
+      msg: "⚠️ Server error or Gemini API is under heavy load. Try again shortly.",
+      error: err?.message || err,
+    });
   }
 });
 
-
-app.listen(process.env.PORT,()=>{
-  console.log(`server is  running at port: ${process.env.PORT} `);
-})
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});
